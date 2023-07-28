@@ -4,7 +4,7 @@ import { loginSchema as validationSchema } from '../validation/loginSchema'
 import { useAuthStore } from '../stores/auth'
 
 const { handleSubmit } = useForm({ validationSchema })
-const auth = useAuthStore
+const auth = useAuthStore()
 
 const email = useField('email')
 const password = useField('password')
@@ -24,6 +24,12 @@ const submit = handleSubmit((values) => {
         <v-card-subtitle class="text-h5">
             Iniciar sesion con tu cuenta
         </v-card-subtitle>
+        <v-alert
+        v-if="auth.hasError"
+            class="my-5"
+            type="error"
+            :title="auth.errorMsg"
+        ></v-alert>
         <v-form class="mt-5">
             <v-text-field class="mb-3" type="email" label="Email" bg-color="blue-grey-lighten-5" v-model="email.value.value" :error-messages="email.errorMessage.value"/>
             <v-text-field class="mb-3" type="password" label="Password" bg-color="blue-grey-lighten-5"  v-model="password.value.value" :error-messages="password.errorMessage.value"/>
