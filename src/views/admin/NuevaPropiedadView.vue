@@ -2,10 +2,11 @@
 import { useForm, useField } from 'vee-validate'
 import { collection, addDoc } from 'firebase/firestore'
 import { useFirestore } from 'vuefire';
+import { useRouter } from 'vue-router';
 import { validationSchema, imageSchema } from '@/validation/propiedadSchema'
 
 const items = [1, 2, 3, 4, 5]
-
+const router = useRouter()
 const db = useFirestore()
 
 const { handleSubmit } = useForm({
@@ -21,16 +22,17 @@ const habitaciones = useField('habitaciones')
 const wc = useField('wc')
 const estacionamiento = useField('estacionamiento')
 const descripcion = useField('descripcion')
-const piscina = useField('piscina')
+const piscina = useField('piscina', null, { initialValue: false })
 
-const submit = handleSubmit(async(values) => {
+const submit = handleSubmit(async (values) => {
     const { imagen, ...propiedad } = values
-    
+
     const docRef = await addDoc(collection(db, "propiedades"), {
-        name: "Tokyo",
-        country: "Japan"
+        ...propiedad
     });
-    console.log("Document written with ID: ", docRef.id);
+    if (docRef.id) {
+        router.push({ name: 'admin-propiedades' })
+    }
 })
 </script>
 
@@ -66,9 +68,10 @@ const submit = handleSubmit(async(values) => {
                 :error-messages="descripcion.errorMessage.value"></v-textarea>
             <v-checkbox label="Piscina" v-model="piscina.value.value" :error-messages="piscina.errorMessage.value" />
             <v-btn color="pink-accent-3" block @click="submit">
-            Agregar Propiedad
-        </v-btn>
-    </v-form>
-</v-card></template>
+                Agregar Propiedad
+            </v-btn>
+        </v-form>
+    </v-card>
+</template>
 
 <style></style>
