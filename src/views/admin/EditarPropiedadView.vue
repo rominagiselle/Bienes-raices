@@ -1,6 +1,6 @@
 <script setup>
 import { watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useFirestore, useDocument } from 'vuefire'
 import { doc, updateDoc } from 'firebase/firestore'
 import { useField, useForm } from 'vee-validate'
@@ -27,6 +27,7 @@ const descripcion = useField('descripcion')
 const piscina = useField('piscina')
 
 const route = useRoute()
+const router = useRouter()
 
 //Obtener la propiedad
 const db = useFirestore()
@@ -44,8 +45,23 @@ watch(propiedad, (propiedad) => {
     center.value = propiedad.ubicacion
 })
 
-const submit = handleSubmit(values => {
-
+const submit = handleSubmit( async values => {
+    const { imagen, ...propiedad } = values
+    if (image.value) {
+        const data = {
+            ...propiedad,
+            imagen: url.value,
+            ubicacion: center.value
+        } 
+        await updateDoc(docRef, data)
+    } else {
+        const data = {
+            ...propiedad,
+            ubicacion: center.value
+        } 
+        await updateDoc(docRef, data)
+    }
+    router.push({name: 'admin-propiedades'})
 })
 </script>
 
@@ -67,6 +83,8 @@ const submit = handleSubmit(values => {
 
             <div class="my-5">
                 <p class="font-weight-bold">Imagen Actual:</p>
+                <img v-if="image" :src="image" class="w-50" />
+                <img v-else :src="propiedad?.imagen" class="w-50" />
             </div>
 
 
